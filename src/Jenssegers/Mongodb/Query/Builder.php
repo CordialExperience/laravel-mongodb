@@ -212,10 +212,12 @@ class Builder extends QueryBuilder {
             if ($this->projections) $pipeline[] = array('$project' => $this->projections);
 
             // Execute aggregation
-            $results = $this->collection->aggregate($pipeline);
+            $oldLAO = ini_set('mongo.long_as_object', true);
+            $results = iterator_to_array($this->collection->aggregateCursor($pipeline));
+            ini_set('mongo.long_as_object', $oldLAO);
 
             // Return results
-            return $results['result'];
+            return $results;
         }
 
         // Distinct query
@@ -993,6 +995,72 @@ class Builder extends QueryBuilder {
         }
 
         return parent::__call($method, $parameters);
+    }
+
+    /**
+     * Retrieve the "count" result of the query.
+     *
+     * @param  string  $columns
+     * @return int
+     */
+    public function count($columns = '*')
+    {
+        if ( ! is_array($columns))
+        {
+            $columns = array($columns);
+        }
+
+        $value = $this->aggregate(__FUNCTION__, $columns);
+
+        return (empty($value)) ? 0 : (int) $value->value;
+    }
+
+    /**
+     * Retrieve the minimum value of a given column.
+     *
+     * @param  string $column
+     * @return mixed
+     * @throws \Exception
+     */
+    public function min($column)
+    {
+        throw new \Exception(__FUNCTION__ . ' is not supported by Moloquent on MongoDB 3.6');
+    }
+
+    /**
+     * Retrieve the maximum value of a given column.
+     *
+     * @param  string $column
+     * @return mixed
+     * @throws \Exception
+     */
+    public function max($column)
+    {
+        throw new \Exception(__FUNCTION__ . ' is not supported by Moloquent on MongoDB 3.6');
+    }
+
+    /**
+     * Retrieve the sum of the values of a given column.
+     *
+     * @param  string $column
+     * @return mixed
+     * @throws \Exception
+     */
+    public function sum($column)
+    {
+        throw new \Exception(__FUNCTION__ . ' is not supported by Moloquent on MongoDB 3.6');
+    }
+
+    /**
+     * Retrieve the average of the values of a given column.
+     *
+     * @param  string $column
+     * @return mixed
+     * @throws \Exception
+     */
+    public function avg($column)
+    {
+        throw new \Exception(__FUNCTION__ . ' is not supported by Moloquent on MongoDB 3.6');
     }
 
 }
