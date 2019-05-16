@@ -69,7 +69,14 @@ class Collection {
             }
             $result = call_user_func_array(array($this->collection, $method), array(&$saveData, $saveParams));
         } else {
-            $result = call_user_func_array(array($this->collection, $method), $parameters);
+            if($method == 'aggregate')
+            {
+                $oldLAO = ini_set('mongo.long_as_object', true);
+                $result['result'] = iterator_to_array($this->collection->aggregateCursor($parameters[0]));
+                ini_set('mongo.long_as_object', $oldLAO);
+            } else {
+                $result = call_user_func_array(array($this->collection, $method), $parameters);
+            }
         }
 
         // Once we have run the query we will calculate the time that it took to run and
