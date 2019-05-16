@@ -1012,7 +1012,7 @@ class Builder extends QueryBuilder {
 
         $value = $this->aggregate(__FUNCTION__, $columns);
 
-        return (empty($value)) ? 0 : (int) $value->value;
+        return (empty($value)) ? 0 : (is_numeric($value) ? $value : (int) $value->value);
     }
 
     /**
